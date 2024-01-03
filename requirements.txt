@@ -5,6 +5,5 @@ rest_framework_simplejwt==5.3.1
 dj_database_url==2.1.0
 psycopg2_binary==2.9.9
 whitenoise==6.6.0
-django_debug_toolbar==4.2.0
 sqlparse==0.4.4
 django_environ==0.11.2
