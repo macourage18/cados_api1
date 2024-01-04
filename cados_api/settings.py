@@ -49,7 +49,7 @@ INSTALLED_APPS = [
 
     "base",
     'rest_framework',
-    'rest_framework_simplejwt',s
+    # 'rest_framework_simplejwt',
 ]
 
 
