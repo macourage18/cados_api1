@@ -26,7 +26,7 @@ def advocate_list(request):
       query=''
 
 
-    advocates = Advocate.objects.filter(Q(username__icontains=query) | Q(bio__icontains=query))
+    advocates = Advocate.objects.filter(Q(username__icontains=query) | Q(bio__icontains=query)| Q(profilePic_icontians=query))
     serialzer = AdvocateSerializer(advocates, many=True)
     return Response(serialzer.data)
   
@@ -34,7 +34,8 @@ def advocate_list(request):
   if request.method == "POST":
     advocate = Advocate.objects.create(
        username=request.data['username'],
-       bio = request.data['bio']
+       bio = request.data['bio'],
+       proflePic=request.data['profilePic']
        )
     serialzer= AdvocateSerializer(advocate, many=False)
 
@@ -58,6 +59,7 @@ class AdvocateDetial(APIView):
     advocate = self.get_object(username)
     advocate.username=request.data['username']
     advocate.bio=request.data['bio']
+    advocate.proflePic=request.data['profilePic']
     advocate.save()
     serializer = AdvocateSerializer(advocate, many=False)
     return Response(serializer.data)
