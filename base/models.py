@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from re import M
 
 # Create your models here.
@@ -17,3 +18,10 @@ class Advocate(models.Model):
 
   def __str__(self):
     return self.username
+  
+class Profile(models.Model):
+  user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+  proflePic = models.ImageField(default='default.png', upload_to='Profile_pics' )
+
+  def __str__(self):
+    return f'{self.user.username} Profile'
