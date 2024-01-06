@@ -26,7 +26,7 @@ def advocate_list(request):
       query=''
 
 
-    advocates = Advocate.objects.filter(Q(username__icontains=query) | Q(bio__icontains=query)| Q(profilePic_icontians=query))
+    advocates = Advocate.objects.filter(Q(username__icontains=query) | Q(bio__icontains=query)| Q(profilePic__icontains=query))
     serialzer = AdvocateSerializer(advocates, many=True)
     return Response(serialzer.data)
   
