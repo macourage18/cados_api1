@@ -4,32 +4,75 @@ from rest_framework.decorators import  api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from .serializers import AdvocateSerializer, CompanySerializer
+from .serializers import AdvocateSerializer, CompanySerializer,AdvocateAllSerializer
 from django.db.models import Q
 
-from .models import Advocate, Company
+from .models import Advocate, Company, AdvocateAll
 # Create your views here.
 
 @api_view(['GET'])
 def endpoints(request):
-  data=['/advocates', 'advocates/:username', 'companies', "compaines/:name", "token" ]
+  data=['/advocates', 'createAd','advocates/:username', 'companies', "compaines/:name", "token" ]
   return Response(data)
 
 
-@api_view(['GET', "POST"])
 # @permission_classes([IsAuthenticated])
-def advocate_list(request):
-  if request.method == 'GET': 
-    query= request.GET.get('query')
-    
-    if query == None:
-      query=''
+class AdvocatesView(APIView):
+    def get(self, request):
+        query = request.GET.get('query', '')
 
+        advocates = Advocate.objects.filter(Q(username__icontains=query) | Q(bio__icontains=query) | Q(profilePic__icontains=query) | Q(company__company__icontains=query))
+        
+        # Creating a list of AdvocateAll instances
+        advocate_all_instances = [
+            AdvocateAll(advocates=advocate)
+            for advocate in advocates
+        ]
+        
+        # Serializing the list of AdvocateAll instances
+        serializer = AdvocateAllSerializer(advocate_all_instances, many=True)
+        print(serializer.data)
 
-    advocates = Advocate.objects.filter(Q(username__icontains=query) | Q(bio__icontains=query)| Q(profilePic__icontains=query))
-    serialzer = AdvocateSerializer(advocates, many=True)
-    return Response(serialzer.data)
+        return Response(serializer.data)
+
   
+
+@api_view(["GET","POST"])
+def advocate_create(request):
+  if request.method == 'GET':
+    query = request.GET.get('query', '')
+    
+    if query is None:
+        query = ''
+
+    advocates = Advocate.objects.filter(
+      Q(bio__icontains=query) |
+      Q(profilePic__icontains=query) |
+      Q(company__company__icontains=query)
+    )
+
+    advocate_instances = [
+      {
+        'username': advocate.username,
+        'bio': advocate.bio,
+        'profilePic': advocate.profilePic,
+        'company': {
+          'company': advocate.company.company if advocate.company else None,
+          'bio': advocate.company.bio if advocate.company else None,
+          'employee_count': advocate.company.advocate_set.count() if advocate.company and advocate.company.id else 0,
+          } if advocate.company else None
+          }
+          for advocate in advocates
+        ]
+
+    serializer = AdvocateSerializer(data=advocate_instances, many=True)
+    serializer.is_valid()
+
+    print(serializer.data)
+
+    return Response(serializer.data)
+
+ 
   
   if request.method == "POST":
     advocate = Advocate.objects.create(
@@ -37,9 +80,9 @@ def advocate_list(request):
        bio = request.data['bio'],
        proflePic=request.data['profilePic']
        )
-    serialzer= AdvocateSerializer(advocate, many=False)
+    serializer= AdvocateSerializer(advocate, many=False)
 
-    return Response(serialzer.data)
+    return Response(serializer.data)
 
 
 class AdvocateDetial(APIView):
@@ -59,7 +102,7 @@ class AdvocateDetial(APIView):
     advocate = self.get_object(username)
     advocate.username=request.data['username']
     advocate.bio=request.data['bio']
-    advocate.proflePic=request.data['profilePic']
+    advocate.profilePic=request.data['profilePic']
     advocate.save()
     serializer = AdvocateSerializer(advocate, many=False)
     return Response(serializer.data)
@@ -111,24 +154,3 @@ def companies_details(request, company):
   if request.method == "DELETE":
     company.delete()
     return Response('company has been deleted')
-
-
-
-# @api_view(['GET', "PUT","DELETE"])
-# def advocate_details(request, username):
-#   advocate=Advocate.objects.get(username=username)
-#   if request.method == 'GET':
-#     serializer = AdvocateSerilizer(advocate, many=False)
-#     return Response(serializer.data)
-  
-#   if request.method == "PUT":
-#     advocate.username=request.data['username']
-#     advocate.bio=request.data['bio']
-
-#     advocate.save()
-#     serializer = AdvocateSerilizer(advocate, many=False)
-#     return Response(serializer.data)
-  
-#   if request.method== "DELETE":
-#     advocate.delete()
-#     return Response('user was deleted')

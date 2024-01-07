@@ -1,5 +1,7 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
-from .models import Advocate, Company
+from .models import Advocate, Company, AdvocateAll
+# from rest_framework import serializers
+
 
 
 class CompanySerializer(ModelSerializer):
@@ -13,8 +15,13 @@ class CompanySerializer(ModelSerializer):
     return count
 
 class AdvocateSerializer(ModelSerializer):
-  company = CompanySerializer(ModelSerializer)
+  company = CompanySerializer(allow_null=True, required=False)
   class Meta:
     model = Advocate
-    fields = ['username', 'bio', 'company', 'profilePic']
+    fields = ['profilePic','username','bio','company']
 
+class AdvocateAllSerializer(ModelSerializer):
+  advocates = AdvocateSerializer()
+  class Meta:
+    model = AdvocateAll
+    fields ='__all__'

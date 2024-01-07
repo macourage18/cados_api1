@@ -8,6 +8,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.views.generic.base import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import AdvocatesView
 
 
 
@@ -15,7 +16,8 @@ urlpatterns = [
   path('', views.endpoints),
 
   path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-  path('advocates/', views.advocate_list, name="advocates"),
+  path('advocates/', views.AdvocatesView.as_view(), name='advocates'),
+  path('createAd/', views.advocate_create, name="advocate"),
   path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('favicon/favicon.ico'))),
   # path('advocates/<str:username>/', views.advocate_details),
   path('advocates/<str:username>/', views.AdvocateDetial.as_view()),
