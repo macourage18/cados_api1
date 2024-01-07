@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from .models import Advocate, Company, AdvocateAll
-# from rest_framework import serializers
+
 
 
 

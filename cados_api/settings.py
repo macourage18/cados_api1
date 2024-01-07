@@ -210,8 +210,10 @@ if not DEBUG:    # Tell Django to copy statics to the `staticfiles` directory
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://192.168.1.179:3000",
-    "https://cados.vercel.app/",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     "http://192.168.1.179:3000",
+#     # "https://cados.vercel.app/",
+# ]
+
+CORS_ORIGIN_ALLOW_ALL=True

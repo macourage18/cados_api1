@@ -20,7 +20,7 @@ def endpoints(request):
 class AdvocatesView(APIView):
     def get(self, request):
         query = request.GET.get('query', '')
-
+        
         advocates = Advocate.objects.filter(Q(username__icontains=query) | Q(bio__icontains=query) | Q(profilePic__icontains=query) | Q(company__company__icontains=query))
         
         # Creating a list of AdvocateAll instances
@@ -50,24 +50,7 @@ def advocate_create(request):
       Q(profilePic__icontains=query) |
       Q(company__company__icontains=query)
     )
-
-    advocate_instances = [
-      {
-        'username': advocate.username,
-        'bio': advocate.bio,
-        'profilePic': advocate.profilePic,
-        'company': {
-          'company': advocate.company.company if advocate.company else None,
-          'bio': advocate.company.bio if advocate.company else None,
-          'employee_count': advocate.company.advocate_set.count() if advocate.company and advocate.company.id else 0,
-          } if advocate.company else None
-          }
-          for advocate in advocates
-        ]
-
-    serializer = AdvocateSerializer(data=advocate_instances, many=True)
-    serializer.is_valid()
-
+    serializer = AdvocateSerializer(advocates, many=True)
     print(serializer.data)
 
     return Response(serializer.data)
