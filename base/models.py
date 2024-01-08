@@ -28,16 +28,20 @@ class Advocate(models.Model):
   
 class Profile(models.Model):
   user = models.OneToOneField(User,  on_delete=models.CASCADE, null=True, blank=True)
-  advocate = models.OneToOneField(Advocate,  on_delete=models.CASCADE, null=True, blank=True)
-  profilePic = models.ImageField(default='default.png', upload_to='Profile_pics' )
+  profilePic = models.ImageField(default='default.png', upload_to='profile_pics' )
 
   def __str__(self):
-    if self.user:
-       return f'{self.user.username} Profile'
-    elif self.advocate:
-      return f'{self.advocate.username} Profile'
-    else:
-      return 'No User'
+    return f'{self.user}'
+   
+    
+
+class AdvocateProfile(models.Model):
+  advocate = models.OneToOneField(Advocate,  on_delete=models.CASCADE, null=True, blank=True)
+  profilePic = models.ImageField(default='default.png', upload_to='profile_pics' )
+
+  def __str__(self):
+    return f'{self.advocate.username}'
+ 
 
 
 class AdvocateAll(models.Model):

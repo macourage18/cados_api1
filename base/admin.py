@@ -1,7 +1,8 @@
 from django.contrib import admin
-from .models import Advocate, Company, Profile
+from .models import *
 # Register your models here.
 
 admin.site.register(Advocate)
 admin.site.register(Company)
 admin.site.register(Profile)
+admin.site.register(AdvocateProfile)
