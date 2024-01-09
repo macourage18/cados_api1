@@ -14,19 +14,24 @@ class CompanySerializer(ModelSerializer):
   def get_employee_count(self, obj):
     count = obj.advocate_set.count()
     return count
-  
+
 
 class AdvocateSerializer(ModelSerializer):
   company = CompanySerializer(allow_null=True, required=False)
-  profilePic = serializers.ImageField(use_url=True)
-  profilePic = AdvocateProfile(ModelSerializer)
   class Meta:
     model = Advocate
-    fields = ['profilePic','username','bio','company']
+    fields = '__all__'
 
+class AdvocateProfileSerializer(ModelSerializer):
+  url = serializers.HyperlinkedIdentityField(view_name='profilePicDetail', read_only=True)
+  advocate=AdvocateSerializer()
+  class Meta:
+    model= AdvocateProfile
+    fields= ['profilePic','advocate','url']
 
+        
 class AdvocateAllSerializer(ModelSerializer):
-  advocates = AdvocateSerializer()
+  advocates = AdvocateProfileSerializer()
   class Meta:
     model = AdvocateAll
     fields ='__all__'

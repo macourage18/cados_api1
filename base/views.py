@@ -4,10 +4,11 @@ from rest_framework.decorators import  api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from .serializers import AdvocateSerializer, CompanySerializer,AdvocateAllSerializer
+from django.shortcuts import get_object_or_404
+from .serializers import *
 from django.db.models import Q
 
-from .models import Advocate, Company, AdvocateAll
+from .models import *
 # Create your views here.
 
 @api_view(['GET'])
@@ -21,7 +22,10 @@ class AdvocatesView(APIView):
     def get(self, request):
         query = request.GET.get('query', '')
 
-        advocates = Advocate.objects.filter(Q(username__icontains=query) | Q(bio__icontains=query) | Q(profilePic__icontains=query) | Q(company__company__icontains=query))
+        advocates = AdvocateProfile.objects.filter(
+          Q(advocate__username__icontains=query) | 
+          Q(advocate__bio__icontains=query)| 
+          Q(advocate__company__company__icontains=query))
         
         # Creating a list of AdvocateAll instances
         advocate_all_instances = [
@@ -30,7 +34,7 @@ class AdvocatesView(APIView):
         ]
         
         # Serializing the list of AdvocateAll instances
-        serializer = AdvocateAllSerializer(advocate_all_instances, many=True)
+        serializer = AdvocateAllSerializer(advocate_all_instances, many=True, context={'request': request})
         print(serializer.data)
         return Response(serializer.data)
 
@@ -44,12 +48,13 @@ def advocate_create(request):
     if query is None:
         query = ''
 
-    advocates = Advocate.objects.filter(
-      Q(bio__icontains=query) |
-      Q(profilePic__icontains=query) |
-      Q(company__company__icontains=query)
+    profilePic = AdvocateProfile.objects.filter(
+      Q(advocate__username__icontains=query)|
+      Q(advocate__bio__icontains=query) |
+      Q(advocate__company__company__icontains=query)
     )
-    serializer = AdvocateSerializer(advocates, many=True)
+
+    serializer = AdvocateProfileSerializer(profilePic, many=True, context={'request': request})
     print(serializer.data)
 
     return Response(serializer.data)
@@ -60,11 +65,17 @@ def advocate_create(request):
     advocate = Advocate.objects.create(
        username=request.data['username'],
        bio = request.data['bio'],
-       proflePic=request.data['profilePic']
+       profilePic=request.data['profilePic']
        )
     serializer= AdvocateSerializer(advocate, many=False)
 
     return Response(serializer.data)
+  
+class ProfilePicDetailView(APIView):
+    def get(self, request, *args, **kwargs):
+        profile = AdvocateProfile.objects.all()
+        serializer = AdvocateProfileSerializer(profile, many=True, context={'request': request})
+        return Response(serializer.data)
 
 
 class AdvocateDetial(APIView):
@@ -84,7 +95,6 @@ class AdvocateDetial(APIView):
     advocate = self.get_object(username)
     advocate.username=request.data['username']
     advocate.bio=request.data['bio']
-    advocate.profilePic=request.data['profilePic']
     advocate.save()
     serializer = AdvocateSerializer(advocate, many=False)
     return Response(serializer.data)

@@ -13,11 +13,12 @@ def save_profile(sender, instance, **kwargs):
   instance.profile.save()
 
 @receiver(post_save, sender=Advocate)
-def create_advocate(sender, instance, **kwargs):
-  # if created:
+def create_advocate(sender, instance,created, **kwargs):
+  if created:
     AdvocateProfile.objects.create(advocate=instance)
 
 
 @receiver(post_save, sender=Advocate)
 def update_advocate(sender, instance, **kwargs):
-  instance.advocateprofile.save()
+   if hasattr(instance, 'advocateprofile'):
+     instance.advocateprofile.save()

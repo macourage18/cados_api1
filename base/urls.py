@@ -8,7 +8,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.views.generic.base import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import AdvocatesView
+from .views import *
 
 
 
@@ -19,6 +19,7 @@ urlpatterns = [
   path('advocates/', views.AdvocatesView.as_view(), name='advocates'),
   path('createAd/', views.advocate_create, name="advocate"),
   path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('favicon/favicon.ico'))),
+   path('profile-pic-detial/<int:pk>/', ProfilePicDetailView.as_view(), name='profilePicDetail'),
   # path('advocates/<str:username>/', views.advocate_details),
   path('advocates/<str:username>/', views.AdvocateDetial.as_view()),
 

@@ -15,7 +15,6 @@ class Company(models.Model):
     return self.company
 
 class Advocate(models.Model):
-  profilePic = models.ImageField(default='default.png', upload_to='Profile_pics' )
   company = models.ForeignKey(Company, on_delete=models.CASCADE,null=True, blank=True)
   username = models.CharField(max_length=200)
   bio = models.TextField(max_length=250, null=True, blank=True)
@@ -36,8 +35,8 @@ class Profile(models.Model):
     
 
 class AdvocateProfile(models.Model):
-  advocate = models.OneToOneField(Advocate,  on_delete=models.CASCADE, null=True, blank=True)
-  profilePic = models.ImageField(default='default.png', upload_to='profile_pics' )
+  advocate = models.ForeignKey(Advocate,  on_delete=models.CASCADE, null=True, blank=True)
+  profilePic = models.ImageField(default='default.png', upload_to='profile_pics')
 
   def __str__(self):
     return f'{self.advocate.username}'
@@ -45,7 +44,7 @@ class AdvocateProfile(models.Model):
 
 
 class AdvocateAll(models.Model):
-  advocates = models.ForeignKey(Advocate, on_delete=models.SET_NULL,null=True, blank=True)
+  advocates = models.ForeignKey(AdvocateProfile, on_delete=models.SET_NULL,null=True, blank=True)
   def __str__(self):
     return str(self.advocates)
    
